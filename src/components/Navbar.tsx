@@ -4,9 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Headphones, Menu, Moon, Sun } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "@/hooks/use-theme";
+import { useAuth } from "../contexts/AuthContext"; // Import useAuth
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
+  const { isAuthenticated, logout } = useAuth(); // Get auth state and logout function
+  const navigate = useNavigate(); // For redirection
+
+  const handleLogout = () => {
+    logout();
+    navigate("/signin");
+  };
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -56,12 +65,18 @@ export const Navbar = () => {
                   <Moon className="h-5 w-5" />
                 )}
               </Button>
-              <Link to="/signin">
-                <Button variant="outline" className="mr-4">Sign In</Button>
-              </Link>
-              <Link to="/app">
-                <Button>Get Started</Button>
-              </Link>
+              {isAuthenticated ? (
+                <Button variant="outline" onClick={handleLogout}>Logout</Button>
+              ) : (
+                <>
+                  <Link to="/signin">
+                    <Button variant="outline" className="mr-4">Sign In</Button>
+                  </Link>
+                  <Link to="/signup"> {/* Changed /app to /signup for Get Started when logged out */}
+                    <Button>Get Started</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
           
@@ -108,13 +123,19 @@ export const Navbar = () => {
                   <Link to="/library" className="px-3 py-2 text-lg font-medium hover:text-primary">
                     Library
                   </Link>
-                  <div className="pt-4 border-t border-gray-200">
-                    <Link to="/signin">
-                      <Button variant="outline" className="w-full mb-2">Sign In</Button>
-                    </Link>
-                    <Link to="/app">
-                      <Button className="w-full">Get Started</Button>
-                    </Link>
+                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    {isAuthenticated ? (
+                      <Button variant="outline" className="w-full" onClick={handleLogout}>Logout</Button>
+                    ) : (
+                      <>
+                        <Link to="/signin">
+                          <Button variant="outline" className="w-full mb-2">Sign In</Button>
+                        </Link>
+                        <Link to="/signup"> {/* Changed /app to /signup for Get Started when logged out */}
+                          <Button className="w-full">Get Started</Button>
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>

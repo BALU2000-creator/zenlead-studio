@@ -1,8 +1,40 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext"; // Adjust path if needed
+import { useState, useEffect, FormEvent } from "react";
 
 const SignIn = () => {
+  const { login, isLoading, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/app"); // Redirect to dashboard if already authenticated
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null); // Clear previous errors
+    try {
+      await login(email, password);
+      // Navigation will be handled by the useEffect hook watching isAuthenticated
+      // Or, can navigate here explicitly if preferred after successful login,
+      // but useEffect is good for handling pre-existing auth state too.
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred.");
+      }
+      console.error("Sign In Error:", err);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-gray-900 dark:to-gray-800 px-4">
       <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg max-w-md w-full p-8">
@@ -11,20 +43,31 @@ const SignIn = () => {
           <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-gray-100">Sign In</h2>
           <p className="text-gray-500 dark:text-gray-400 text-center">Sign in to Zenlead Studio to access your dashboard and tools.</p>
         </div>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <input
             type="email"
             placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring focus:ring-primary"
             required
+            disabled={isLoading}
           />
           <input
             type="password"
             placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring focus:ring-primary"
             required
+            disabled={isLoading}
           />
-          <Button type="submit" className="w-full">Sign In</Button>
+          {error && (
+            <p className="text-red-500 text-sm text-center">{error}</p>
+          )}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Signing In..." : "Sign In"}
+          </Button>
         </form>
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
@@ -35,6 +78,7 @@ const SignIn = () => {
           </div>
         </div>
         <div className="flex justify-center gap-4">
+          {/* Placeholder buttons for Google/Twitter, functionality not in scope */}
           <Button
             variant="outline"
             className="p-2 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"

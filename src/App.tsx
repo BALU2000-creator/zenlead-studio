@@ -6,6 +6,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { Construction } from "lucide-react";
 
+// Import AuthProvider
+import { AuthProvider } from "./contexts/AuthContext";
+
+// Import ProtectedRoute
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import AudioProcessing from "./pages/AudioProcessing";
@@ -48,25 +54,22 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <div className="min-h-screen bg-background">
-          <div className="w-full bg-amber-100 dark:bg-gray-800/50 text-foreground dark:text-muted-foreground text-center py-2 px-2 sm:px-4 flex items-center justify-center gap-2 text-xs sm:text-sm z-10">
-            <Construction className="h-4 w-4 text-amber-600 dark:text-amber-300" />
-            <p className="font-medium">
+        {/* Wrap BrowserRouter with AuthProvider */}
+        <AuthProvider>
+          <div className="min-h-screen bg-background">
+            <div className="w-full bg-amber-100 dark:bg-gray-800/50 text-foreground dark:text-muted-foreground text-center py-2 px-2 sm:px-4 flex items-center justify-center gap-2 text-xs sm:text-sm z-10">
+              <Construction className="h-4 w-4 text-amber-600 dark:text-amber-300" />
+              <p className="font-medium">
               App under construction: All functionalities are currently disabled. See you soon!
             </p>
           </div>
           <BrowserRouter>
             <Routes>
+              {/* Public routes */}
               <Route path="/" element={<Index />} />
-              <Route path="/app" element={<Dashboard />} />
-              <Route path="/audio" element={<AudioProcessing />} />
-              <Route path="/text" element={<TextProcessing />} />
-              <Route path="/text-processing" element={<TextProcessing />} />
-              <Route path="/video" element={<VideoProcessing />} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/library" element={<Library />} />
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignUp />} />
+              <Route path="/pricing" element={<Pricing />} />
               <Route path="/case-studies" element={<CaseStudies />} />
               <Route path="/documentation" element={<Documentation />} />
               <Route path="/company" element={<Company />} />
@@ -79,10 +82,23 @@ const App = () => {
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/cookie-policy" element={<CookiePolicy />} />
               <Route path="/gdpr" element={<GDPR />} />
+            
+              {/* Protected Routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/app" element={<Dashboard />} />
+                <Route path="/audio" element={<AudioProcessing />} />
+                <Route path="/text" element={<TextProcessing />} />
+                <Route path="/text-processing" element={<TextProcessing />} /> 
+                <Route path="/video" element={<VideoProcessing />} />
+                <Route path="/library" element={<Library />} />
+                {/* Add any other routes that need protection here as children of ProtectedRoute */}
+              </Route>
+            
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </div>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
